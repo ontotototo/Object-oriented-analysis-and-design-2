@@ -1,0 +1,46 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="SneakerBuilderApp.MainWindow"
+        Width="750" Height="520"
+        Title="Sneaker Builder">
+
+    <Grid ColumnDefinitions="*,*">
+        <StackPanel Margin="10" Spacing="6">
+
+            <TextBlock Text="Назначение:" FontWeight="Bold"/>
+            <RadioButton x:Name="VolleyballRB" Content="Волейбол"/>
+            <RadioButton x:Name="UrbanRB" Content="Город"/>
+            <RadioButton x:Name="CollabRB" Content="Коллекционная"/>
+
+            <Separator/>
+
+            <TextBlock Text="Дополнительные опции:" FontWeight="Bold"/>
+            <CheckBox x:Name="GelCB" Content="Гелевая амортизация"/>
+            <CheckBox x:Name="ReinforcedSoleCB" Content="Усиленная подошва"/>
+            <CheckBox x:Name="PremiumUpperCB" Content="Премиальный верх"/>
+
+            <Button Content="Собрать кроссовок"
+                    Click="BuildButton_Click"
+                    Margin="0,10,0,0"/>
+
+            <TextBlock Text="Процесс сборки:" FontWeight="Bold"/>
+            <TextBox x:Name="LogBox" Height="110" IsReadOnly="True"/>
+
+            <ProgressBar x:Name="Progress"
+                         Minimum="0" Maximum="100"
+                         Height="14"/>
+
+            <TextBlock Text="Результат:" FontWeight="Bold"/>
+            <TextBox x:Name="ResultBox"
+                     Height="120"
+                     IsReadOnly="True"/>
+        </StackPanel>
+
+        <Image x:Name="SneakerImage"
+               Grid.Column="1"
+               Width="320"
+               Height="320"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"/>
+    </Grid>
+</Window>
