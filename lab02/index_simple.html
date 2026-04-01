@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>🏠 Умный Дом (БЕЗ Composite)</title>
+    <link rel="stylesheet" href="style_simple.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🏠 Умный Дом — Без паттерна</h1>
+        <p style="text-align:center;color:#aaa;font-size:14px;margin-bottom:20px;">
+            🔗 <a href="http://localhost:8080" style="color:#4CAF50">Версия с Composite →</a>
+        </p>
+        
+        <div class="house">
+            <div class="room" id="bedroom">
+                <h2>🚪 Спальня</h2>
+                <div class="devices">
+                    <div class="device light" onclick="toggleDevice('bedroom','light',0)">
+                        <div class="icon">💡</div><div class="name">Потолочный</div>
+                        <div class="light-effect"></div>
+                    </div>
+                    <div class="device light" onclick="toggleDevice('bedroom','light',1)">
+                        <div class="icon">💡</div><div class="name">Ночник</div>
+                        <div class="light-effect"></div>
+                    </div>
+                    <div class="device ac" onclick="toggleDevice('bedroom','ac',0)">
+                        <div class="icon">❄️</div><div class="name">Кондиционер</div>
+                        <div class="wind-effect"></div>
+                    </div>
+                </div>
+                <button class="room-btn" onclick="toggleRoom('bedroom')">Вкл/Выкл комнату</button>
+            </div>
+
+            <!-- Кухня -->
+            <div class="room" id="kitchen">
+                <h2>🚪 Кухня</h2>
+                <div class="devices">
+                    <div class="device light" onclick="toggleDevice('kitchen','light',0)">
+                        <div class="icon">💡</div><div class="name">Люстра</div>
+                        <div class="light-effect"></div>
+                    </div>
+                    <div class="device ac" onclick="toggleDevice('kitchen','ac',0)">
+                        <div class="icon">❄️</div><div class="name">Вытяжка</div>
+                        <div class="wind-effect"></div>
+                    </div>
+                </div>
+                <button class="room-btn" onclick="toggleRoom('kitchen')">Вкл/Выкл комнату</button>
+            </div>
+        </div>
+
+        <div class="house-controls">
+            <button class="house-btn on" onclick="toggleHouse(true)">⚡ Включить дом</button>
+            <button class="house-btn off" onclick="toggleHouse(false)">🌙 Выключить дом</button>
+        </div>
+
+        <div class="log" id="log"><h3>📋 Журнал:</h3><div id="log-content"></div></div>
+    </div>
+
+    <script>
+        // 🔥 ТОЛЬКО GET-запросы (параметры в URL)
+        function toggleDevice(room, type, index) {
+            console.log(`🔌 ${room}/${type}/${index}`);
+            fetch(`http://localhost:8081/api/device/toggle?room=${room}&type=${type}&index=${index}`)
+            .then(r => r.json())
+            .then(res => {
+                updateVisual(room, type, index, res.status === 'on');
+                addLog(`💡 ${type} #${index} ${res.status}`);
+            })
+            .catch(e => {
+                console.error(e);
+                addLog('❌ Ошибка соединения');
+            });
+        }
+
+        function toggleRoom(room) {
+            fetch(`http://localhost:8081/api/room/toggle?room=${room}`)
+            .then(r => r.json())
+            .then(res => {
+                document.getElementById(room).querySelectorAll('.device').forEach(d => {
+                    res.status === 'on' ? d.classList.add('on') : d.classList.remove('on');
+                });
+                addLog(`🚪 Комната ${room} ${res.status}`);
+            })
+            .catch(e => addLog('❌ Ошибка'));
+        }
+
+        function toggleHouse(on) {
+            fetch(`http://localhost:8081/api/house/toggle?state=${on ? 'on' : 'off'}`)
+            .then(() => {
+                document.querySelectorAll('.device').forEach(d => {
+                    on ? d.classList.add('on') : d.classList.remove('on');
+                });
+                addLog(`🏠 Дом ${on ? 'включен' : 'выключен'}`);
+            })
+            .catch(e => addLog('❌ Ошибка'));
+        }
+
+        function updateVisual(room, type, index, on) {
+            const roomEl = document.getElementById(room);
+            const devices = roomEl.querySelectorAll(`.device.${type}`);
+            if (devices[index]) {
+                on ? devices[index].classList.add('on') : devices[index].classList.remove('on');
+            }
+        }
+
+        function addLog(msg) {
+            const log = document.getElementById('log-content');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            log.insertBefore(entry, log.firstChild);
+            while(log.children.length > 20) log.removeChild(log.lastChild);
+        }
+
+        window.onload = () => addLog('🎮 Готово! (без Composite)');
+    </script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>🏠 Умный Дом</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🏠 Умный Дом </h1>
+        <div class="house">
+            <div class="room" id="bedroom">
+                <h2>🚪 Спальня</h2>
+                <div class="devices">
+                    <div class="device light" id="bedroom-light1" onclick="toggleDevice('ceiling-light')">
+                        <div class="icon">💡</div><div class="name">Потолочный свет</div><div class="light-effect"></div>
+                    </div>
+                    <div class="device light" id="bedroom-light2" onclick="toggleDevice('night-light')">
+                        <div class="icon">💡</div><div class="name">Ночник</div><div class="light-effect"></div>
+                    </div>
+                    <div class="device ac" id="bedroom-ac" onclick="toggleDevice('bedroom-ac')">
+                        <div class="icon">❄️</div><div class="name">Кондиционер</div><div class="wind-effect"></div>
+                    </div>
+                </div>
+                <button class="room-btn" onclick="toggleRoom('bedroom')">Вкл/Выкл комнату</button>
+            </div>
+            <div class="room" id="kitchen">
+                <h2>🚪 Кухня</h2>
+                <div class="devices">
+                    <div class="device light" id="kitchen-light1" onclick="toggleDevice('kitchen-light')">
+                        <div class="icon">💡</div><div class="name">Люстра</div><div class="light-effect"></div>
+                    </div>
+                    <div class="device ac" id="kitchen-ac" onclick="toggleDevice('kitchen-ac')">
+                        <div class="icon">❄️</div><div class="name">Вытяжка</div><div class="wind-effect"></div>
+                    </div>
+                </div>
+                <button class="room-btn" onclick="toggleRoom('kitchen')">Вкл/Выкл комнату</button>
+            </div>
+        </div>
+        <div class="house-controls">
+            <button class="house-btn on" onclick="toggleHouse(true)"> Включить весь дом</button>
+            <button class="house-btn off" onclick="toggleHouse(false)"> Выключить весь дом</button>
+        </div>
+        <div class="log" id="log"><h3> Журнал:</h3><div id="log-content"></div></div>
+    </div>
+
+    <script>
+        const deviceMap = {
+            'ceiling-light': 'bedroom-light1',
+            'night-light': 'bedroom-light2',
+            'bedroom-ac': 'bedroom-ac',
+            'kitchen-light': 'kitchen-light1',
+            'kitchen-ac': 'kitchen-ac'
+        };
+
+        window.toggleDevice = async function(deviceName) {
+            console.log('🔌 Toggle:', deviceName);
+            try {
+                const res = await fetch('http://localhost:8080/api/device/toggle?id=' + encodeURIComponent(deviceName));
+                const result = await res.json();
+                console.log(' Ответ:', result);
+                const elementId = deviceMap[deviceName];
+                if (elementId) {
+                    const el = document.getElementById(elementId);
+                    if (el) el.classList.toggle('on', result.status === 'on');
+                }
+                addLog(` ${deviceName} ${result.status === 'on' ? 'включено' : 'выключено'}`);
+            } catch (e) { console.error(e); addLog(' Ошибка'); }
+        };
+
+        window.toggleRoom = async function(roomId) {
+            console.log('🚪 Toggle room:', roomId);
+            try {
+                const res = await fetch('http://localhost:8080/api/room/toggle?id=' + roomId);
+                const result = await res.json();
+                console.log(' Ответ:', result);
+                const room = document.getElementById(roomId);
+                if (room) {
+                    room.querySelectorAll('.device').forEach(d => d.classList.toggle('on', result.status === 'on'));
+                }
+                addLog(`🚪 Комната ${roomId} ${result.status === 'on' ? 'включена' : 'выключена'}`);
+            } catch (e) { console.error(e); addLog(' Ошибка'); }
+        };
+
+        window.toggleHouse = async function(turnOn) {
+            console.log(' Toggle house:', turnOn);
+            try {
+                await fetch('http://localhost:8080/api/house/toggle?state=' + (turnOn ? 'on' : 'off'));
+                document.querySelectorAll('.device').forEach(d => d.classList.toggle('on', turnOn));
+                addLog(` Дом ${turnOn ? 'включен' : 'выключен'}`);
+            } catch (e) { console.error(e); addLog(' Ошибка'); }
+        };
+
+        function addLog(msg) {
+            const log = document.getElementById('log-content');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            log.insertBefore(entry, log.firstChild);
+            while (log.children.length > 20) log.removeChild(log.lastChild);
+        }
+
+        window.onload = () => { addLog(' Готово! Нажми на устройство'); };
+    </script>
+</body>
+</html>
