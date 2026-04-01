@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>🏠 Умный Дом (БЕЗ Composite)</title>
+    <title>🏠 Умный Доm</title>
     <link rel="stylesheet" href="style_simple.css">
 </head>
 <body>
@@ -31,8 +31,7 @@
                 </div>
                 <button class="room-btn" onclick="toggleRoom('bedroom')">Вкл/Выкл комнату</button>
             </div>
-
-            <!-- Кухня -->
+            
             <div class="room" id="kitchen">
                 <h2>🚪 Кухня</h2>
                 <div class="devices">
@@ -58,7 +57,7 @@
     </div>
 
     <script>
-        // 🔥 ТОЛЬКО GET-запросы (параметры в URL)
+        
         function toggleDevice(room, type, index) {
             console.log(`🔌 ${room}/${type}/${index}`);
             fetch(`http://localhost:8081/api/device/toggle?room=${room}&type=${type}&index=${index}`)
@@ -69,7 +68,7 @@
             })
             .catch(e => {
                 console.error(e);
-                addLog('❌ Ошибка соединения');
+                addLog(' Ошибка соединения');
             });
         }
 
@@ -82,7 +81,7 @@
                 });
                 addLog(`🚪 Комната ${room} ${res.status}`);
             })
-            .catch(e => addLog('❌ Ошибка'));
+            .catch(e => addLog(' Ошибка'));
         }
 
         function toggleHouse(on) {
@@ -93,7 +92,7 @@
                 });
                 addLog(`🏠 Дом ${on ? 'включен' : 'выключен'}`);
             })
-            .catch(e => addLog('❌ Ошибка'));
+            .catch(e => addLog(' Ошибка'));
         }
 
         function updateVisual(room, type, index, on) {
